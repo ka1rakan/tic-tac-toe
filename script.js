@@ -93,6 +93,29 @@ function Gameboard(){
         }
     }
 
+    const checkGameOver = () => {
+        const topRow = board.getBoard()[0].map((cell)=>cell.getValue());
+        const midRow = board.getBoard()[1].map((cell)=>cell.getValue());
+        const botRow = board.getBoard()[2].map((cell)=>cell.getValue());
+        const leftCol = [board.getBoard()[0][0].getValue(), board.getBoard()[1][0].getValue(), board.getBoard()[2][0].getValue()];
+        const midCol = [board.getBoard()[0][1].getValue(), board.getBoard()[1][1].getValue(), board.getBoard()[2][1].getValue()];
+        const rightCol = [board.getBoard()[0][2].getValue(), board.getBoard()[1][2].getValue(), board.getBoard()[2][2].getValue()];;
+        const topLBotR = [board.getBoard()[0][0].getValue(), board.getBoard()[1][1].getValue(), board.getBoard()[2][2].getValue()];
+        const topRBotL = [board.getBoard()[0][2].getValue(), board.getBoard()[1][1].getValue(), board.getBoard()[2][0].getValue()];
+
+        const consecutives = [topRow, midRow, botRow ,leftCol, midCol, rightCol, topLBotR, topRBotL];
+        let gameover = false;
+        for(i in consecutives){
+            if(consecutives[i][0]===consecutives[i][1]&&consecutives[i][1]===consecutives[i][2]){
+                gameover = true;
+                break;
+            }else{
+                gameover = false;
+            }
+        }
+        console.log("GAMEOVER")
+    }
+
     // playRound function is responsible of playing a single round
     // depending on active player and user input
     const playRound = () => {
@@ -100,5 +123,5 @@ function Gameboard(){
         switchPlayerTurn();
         console.log(board.displayValues(), activePlayer);
     }
-    playRound()
+    //playRound()
 })()
