@@ -41,8 +41,8 @@ function Gameboard(){
     // This is a seperate function from the addToken 
     // function inside Cell the difference is that the user
     // will have access to this function in order to change cell data
-    const addToken = (cell) => {
-        cell.addToken(1);
+    const addToken = (cell,token) => {
+        cell.addToken(token===1 ? "X" : "O");
     }
 
     // This function is to display the table with the cell values
@@ -65,7 +65,7 @@ function Gameboard(){
 ** GameController function is the main function that will control
 ** the flow of the game with switchPlayerTurn playRound and checkGameOver functions
 */
-(function GameController(
+function GameController(
     playerOneName = "player one",
     playerTwoName = "player two"){
 
@@ -106,22 +106,33 @@ function Gameboard(){
         const consecutives = [topRow, midRow, botRow ,leftCol, midCol, rightCol, topLBotR, topRBotL];
         let gameover = false;
         for(i in consecutives){
-            if(consecutives[i][0]===consecutives[i][1]&&consecutives[i][1]===consecutives[i][2]){
+            if(consecutives[i][0]===consecutives[i][1]&&consecutives[i][1]===consecutives[i][2]&&consecutives[i][0]!==0){
                 gameover = true;
                 break;
             }else{
                 gameover = false;
             }
         }
-        console.log("GAMEOVER")
+        return gameover;
     }
 
     // playRound function is responsible of playing a single round
     // depending on active player and user input
     const playRound = () => {
-        board.addToken(board.getBoard()[0][0]);
+        const row = prompt("row: ");
+        const column = prompt("column: ");
+        board.addToken(board.getBoard()[row][column], activePlayer.token);
         switchPlayerTurn();
-        console.log(board.displayValues(), activePlayer);
     }
-    //playRound()
-})()
+
+    const playGame = () => {
+        while(!checkGameOver()){
+            playRound()
+            console.log(board.getBoard().map((row)=>row.map((cell)=>cell.getValue())))
+        }
+    }
+    
+    return {playGame}
+}
+
+const game = GameController();
