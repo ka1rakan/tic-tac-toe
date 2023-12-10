@@ -1,0 +1,10 @@
+.container{
+    width: 60vh;
+    height: 60vh;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr) ;
+    margin: 0 auto;
+}
+.cell{
+    border: 1px solid black;
+}

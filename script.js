@@ -8,6 +8,9 @@ function Gameboard(){
     const columns = 3;
     const board = [];
 
+    // this is our board display container
+    const container = document.querySelector(".container");
+    const cells = container.children;
     
     // Create a 2d array of 9 cells (3rows 3 columns)
     // Assign a cell to each unit of the board
@@ -16,6 +19,10 @@ function Gameboard(){
         board[i] = []
         for (let j=0; j<columns; j++){
             board[i][j] = Cell();
+            // add gric cells to our display container
+            const cell = document.createElement("div");
+            cell.className = "cell"
+            container.appendChild(cell)
         }
     }
     
@@ -28,7 +35,7 @@ function Gameboard(){
     // that will help us display and change cell data
     function Cell(){
         let value = 0;
-
+        
         const addToken = (player) => {
             value = player;
         }
@@ -41,8 +48,11 @@ function Gameboard(){
     // This is a seperate function from the addToken 
     // function inside Cell the difference is that the user
     // will have access to this function in order to change cell data
-    const addToken = (cell,token) => {
-        cell.addToken(token===1 ? "X" : "O");
+    const addToken = (row, column,token) => {
+        const tokenEqu = token==1 ? "X" : "O"
+        board[row][column].addToken(tokenEqu);
+        const index = (Number(row) * 3) + Number(column);
+        cells[index].innerText = tokenEqu;
     }
 
     // This function is to display the table with the cell values
@@ -58,8 +68,11 @@ function Gameboard(){
         return displayBoard;
     }
 
-    return {getBoard, addToken, displayValues}
+    return {getBoard, addToken, displayValues, cells, container}
 };
+
+//const b = Gameboard();
+
 
 /*
 ** GameController function is the main function that will control
@@ -119,9 +132,13 @@ function GameController(
     // playRound function is responsible of playing a single round
     // depending on active player and user input
     const playRound = () => {
-        const row = prompt("row: ");
-        const column = prompt("column: ");
-        board.addToken(board.getBoard()[row][column], activePlayer.token);
+        for (let i=0; i<board.cells.length; i++){
+            board.cells[i].addEventListener("click", (e) => {
+                const row = Math.floor(i/3);
+                const column = i%3;
+                board.addToken(row, column, activePlayer.token)
+            })
+        }
         switchPlayerTurn();
     }
 
@@ -132,7 +149,8 @@ function GameController(
         }
     }
     
-    return {playGame}
+    return {playGame, playRound}
 }
 
 const game = GameController();
+game.playGame()
