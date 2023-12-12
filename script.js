@@ -6,7 +6,7 @@
 function Gameboard(){
     const rows = 3;
     const columns = 3;
-    const board = [];
+    let board = [];
 
     // this is our board display container
     const container = document.querySelector(".container");
@@ -22,6 +22,7 @@ function Gameboard(){
             // add gric cells to our display container
             const cell = document.createElement("div");
             cell.className = "cell"
+            cell.setAttribute("id", `cell-${i*3+j}`)
             container.appendChild(cell)
         }
     }
@@ -29,6 +30,13 @@ function Gameboard(){
     // This getBoard function will be used outside of
     // Gameboard function to access our board
     const getBoard = () => board;
+
+    const resetBoard = () => {
+        board = board.map((row)=>row.map((cell)=>cell.resetValue()))
+        for (let i = 0; i<cells.length; i++){
+            cells[i].innerText = ""
+        }
+    }
 
     // This is our cell generator function
     // It has addToken and getValue functions 
@@ -42,7 +50,12 @@ function Gameboard(){
 
         const getValue = () => value;
 
-        return {addToken, getValue}
+        const resetValue = () => {
+            value = 0;
+            return Cell()
+        }
+
+        return {addToken, getValue, resetValue}
     }
 
     // This is a seperate function from the addToken 
@@ -57,7 +70,7 @@ function Gameboard(){
 
     // This function is to display the table with the cell values
     // written in each cell
-    const displayValues = () => {
+    const displayBoard = () => {
         let board = getBoard()
         let displayBoard = [];
         for (r in board){
@@ -68,10 +81,9 @@ function Gameboard(){
         return displayBoard;
     }
 
-    return {getBoard, addToken, displayValues, cells, container}
+    return {getBoard, addToken, displayBoard, resetBoard, cells}
 };
 
-//const b = Gameboard();
 
 
 /*
@@ -122,35 +134,48 @@ function GameController(
             if(consecutives[i][0]===consecutives[i][1]&&consecutives[i][1]===consecutives[i][2]&&consecutives[i][0]!==0){
                 gameover = true;
                 break;
+            }else if(board.displayBoard()===board.displayBoard().map((row)=>row.filter((cell)=>cell!==0))){
+                gameover = true;
+                break;
             }else{
-                gameover = false;
+            gameover =  false;
             }
         }
         return gameover;
     }
 
+    const reset = document.querySelector(".reset")
+    reset.addEventListener("click", board.resetBoard);
     // playRound function is responsible of playing a single round
     // depending on active player and user input
-    const playRound = () => {
-        for (let i=0; i<board.cells.length; i++){
-            board.cells[i].addEventListener("click", (e) => {
-                const row = Math.floor(i/3);
-                const column = i%3;
-                board.addToken(row, column, activePlayer.token)
-            })
+    const listener = (e) => {
+        const cellNumber = e.target.id[e.target.id.length -1];
+        const row = Math.floor(cellNumber/3);
+        const column = cellNumber % 3;
+        if(e.target.innerText===""){
+            board.addToken(row, Number(column), activePlayer.token)
+            if(!checkGameOver()){
+                switchPlayerTurn()
+            }
+            else{
+                console.log("gameover")
+                for(let j=0; j<board.cells.length; j++){
+                    board.cells[j].removeEventListener("click", listener)
+                }
+            }
         }
-        switchPlayerTurn();
     }
 
     const playGame = () => {
-        while(!checkGameOver()){
-            playRound()
-            console.log(board.getBoard().map((row)=>row.map((cell)=>cell.getValue())))
+        for (let i=0; i<board.cells.length; i++){
+            board.cells[i].addEventListener("click", listener)
         }
     }
     
-    return {playGame, playRound}
+    
+    return {playGame, board, checkGameOver}
 }
 
 const game = GameController();
 game.playGame()
+
