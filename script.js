@@ -91,8 +91,8 @@ function Gameboard(){
 ** the flow of the game with switchPlayerTurn playRound and checkGameOver functions
 */
 function GameController(
-    playerOneName = "player one",
-    playerTwoName = "player two"){
+    playerOneName = "X",
+    playerTwoName = "O"){
 
     const board = Gameboard();
     
@@ -145,7 +145,12 @@ function GameController(
     }
 
     const reset = document.querySelector(".reset")
-    reset.addEventListener("click", board.resetBoard);
+    reset.addEventListener("click", () => {
+        board.resetBoard();
+        header.innerText = `${activePlayer.name}'s turn`
+        playGame();
+    });
+    const header = document.querySelector("header");
     // playRound function is responsible of playing a single round
     // depending on active player and user input
     const listener = (e) => {
@@ -156,9 +161,10 @@ function GameController(
             board.addToken(row, Number(column), activePlayer.token)
             if(!checkGameOver()){
                 switchPlayerTurn()
+                header.innerText = `${activePlayer.name}'s turn`;
             }
             else{
-                console.log("gameover")
+                header.innerText = `${activePlayer.name} won!`;
                 for(let j=0; j<board.cells.length; j++){
                     board.cells[j].removeEventListener("click", listener)
                 }
@@ -176,6 +182,7 @@ function GameController(
     return {playGame, board, checkGameOver}
 }
 
+
+
 const game = GameController();
 game.playGame()
-
